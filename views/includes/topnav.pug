@@ -9,17 +9,9 @@
         ul.navbar-nav.ml-auto
           li.nav-item
             a.nav-link(href="/events") BROWSE EVENT
-          //if(currentUser._id.equals('5a11ae950dab1424b80ae4d5'))
+          if (currentUser && ( currentUser.name == "admin"))
             li.nav-item
                 a.nav-link(href='/admin') Admin
-           else
-          li.nav-item.dropdown
-            a.nav-link.dropdown-toggle(data-toggle="dropdown" aria-haspopup="true" aria-expanded="true") Organize
-            div.dropdown-menu
-              a.dropdown-item(href="/organize/overview") Overview
-              a.dropdown-item(href="/organize/pricing") Pricing
-              a.dropdown-item(href="/organize/blog") Blog
-              a.dropdown-item(href="/organize/resources") Resources
           if (!currentUser)
             li.nav-item
               a.nav-link(href='/signin') Signin 

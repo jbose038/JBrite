@@ -35,21 +35,24 @@ block content
       .p /
       .p= event.org_comment
 
+  a.btn.btn-outline-secondary(href='/events') Back
+  |
+  |
   if event.author.id == currentUser.id
     a.btn.btn-outline-primary(href=`/events/${event._id}/edit`) Edit
     |
     |
     a.btn.btn.need-confirm-btn.btn-outline-danger(href=`/events/${event._id}?_method=DELETE`) Delete
-  |
-  |
-  a.btn.btn-outline-secondary(href='/events') Back
+
   hr
-  if event.author.id == currentUser.id && event.numJoined > 0
-    h3 #{event.numJoined} Joined
-    .entrylist.show
-      each entrylist in entrylists
-        .p= entrylist.author.name
-        
+  if event.numJoined > 0
+    h3 #{event.numJoined} 명 현재 참여중
+    if event.author.id == currentUser.id
+      .entrylist.show
+        each entrylist in entrylists
+          .p= entrylist.author.name
+    else
+      .p 해당 이벤트 등록자만 신청목록을 확인 할 수 있습니다.
   hr
   
   //참가한 자신 목록에서 삭제

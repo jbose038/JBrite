@@ -79,4 +79,11 @@ router.delete('/:id', catchErrors(async (req, res, next) => {
 }));
 
 
+//payment = free
+router.post('events/new/free',catchErrors(async (req,res,next) =>{
+}));
+
+//payment = paid
+router.post('events/new/paid',catchErrors(async (req,res,next) =>{
+}));
 module.exports = router;

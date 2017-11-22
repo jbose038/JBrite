@@ -7,12 +7,12 @@ block content
       input.form-control.mr-sm-2(type='text', name='term', placeholder='Search', aria-label='Search', value=term)
 
   .container
-    h1.main-title Events For You
+    h1.main-title= 'Events For You(=' + currentUser.name + ')'
     
     table.table.table-hover
       thead
         tr
-          th 주최자
+          th 등록자
           th 제목
           th 장소
           th 시작날짜
@@ -36,6 +36,7 @@ block content
               if event.author.id == currentUser.id
                 a.btn.btn-sm.btn-outline-secondary(href=`/events/${event._id}/edit`) 
                   | #[i.fa.fa-pencil] Edit
+                |
                 |
                 a.btn.btn-sm.need-confirm-btn.btn-outline-danger(href=`/events/${event._id}?_method=DELETE`)
                   | #[i.fa.fa-trash] Delete

@@ -108,7 +108,9 @@ router.post('/', needAuth, catchErrors(async (req,res,next) => {
 }));
 
 router.post('/:id/entry', needAuth, catchErrors(async (req,res,body) => {
-  var user = await EntryList.findOne({author: req.user._id});
+
+  const event = await EVT.findById(req.params.id);
+  var user = await EntryList.findOne({author: req.user._id, event: event});
   if(user)
   {
     req.flash('danger', 'You already joined');
@@ -116,7 +118,6 @@ router.post('/:id/entry', needAuth, catchErrors(async (req,res,body) => {
   }
 
   user = req.user;
-  const event = await EVT.findById(req.params.id);
 
   var entrylist = new EntryList({
     author: user._id,

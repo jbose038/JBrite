@@ -1,0 +1,38 @@
+body {
+  margin: 0% 10% 0% 10%;
+  padding: 50px;
+  font: 14px "Lucida Grande", Helvetica, Arial, sans-serif; }
+
+a {
+  color: #00B7FF; }
+.btn-block{
+  width: 50%;
+}
+.container.detail{
+  margin: 0;
+  padding: 0;
+}
+.container.title{
+  text-align: center;
+}
+.container.event{
+  font-size: 1.5em;
+  display: inline-block;
+  width: 500px;
+  padding: 2% 0% 2% 0%;
+  text-align: center;
+}
+label.evt_type{
+  width: 400px;
+}
+select{
+  display: block;
+}
+.form-control{
+  width: 400px;
+}
+#date_start, #date_end{
+  width: 200px;
+}
+
+/*# sourceMappingURL=style.css.map */

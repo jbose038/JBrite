@@ -1,0 +1,43 @@
+extends ../layout
+
+block content
+  .container.detail
+    .container.title
+      h1.main-title= event.title
+    hr
+    .container.event.location
+      h3 장소
+      .p= event.location
+    
+    .container.event.date
+      h3 날짜
+      .p= event.date_start +' ~ ' + event.date_end
+
+    .container.event.desc
+      h3 상세 설명
+      .p= event.description
+
+    .container.event.payment
+      h3 가격
+      .p= event.payment
+
+    .container.event.evt_type
+      h3 이벤트 종류
+      .p= event.evt_type
+
+    .container.event.evt_topic
+      h3 이벤트 주제
+      .p= event.evt_topic
+    
+    .container.event.org_nameNcomment
+      h3 등록 조직의 이름 / 상세설명
+      .p= event.org_name
+      .p /
+      .p= event.org_comment
+  hr
+  
+    
+  a.btn.btn-outline-primary(href=`/events/${event._id}/edit`) Edit
+  |
+  |
+  a.btn.btn-outline-secondary(href='/events') Back

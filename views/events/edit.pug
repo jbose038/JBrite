@@ -1,0 +1,81 @@
+extends ../layout
+
+block content
+    h1 이벤트 수정
+    form(action=`/events/${event._id}?_method=PUT`, method='POST')
+      .form-group
+        label(for='title') 제목
+        input.form-control(type='text', id='title', name='title', placeholder='이벤트의 제목을 입력하세요.', value=event.title)
+      .form-group
+        label(for='location') 장소
+        input.form-control(type='text', id='location', name='location', placeholder='장소를 입력하세요.', value=event.location)
+      .form-group
+        label(for='date_start') 시작할 날짜
+        input.form-control(type='date', id='date_start', name='date_start', placeholder='')
+      .form-group
+        label(for='date_end') 종료할 날짜
+        input.form-control(type='date', id='date_end', name='date_end', placeholder='')
+      .form-group
+        label(for='description') 상세 설명
+        input.form-control.input-lg(type='text', id='description', name='description', placeholder='상세설명을 입력하세요.', value=event.description)
+      .form-group
+        label(for='org_name') 등록조직 이름
+        input.form-control.input-lg(type='text', id='org_name', name='org_name', placeholder='등록할 조직의 이름을 입력하세요.', value=event.org_name)
+      .form-group
+        label(for='org_comment') 등록조직 상세 설명
+        textarea.form-control(row='5', name='org_comment', placeholder='등록할 조직에 대한 설명을 입력하세요')
+      .form-group
+        label(for='evt_type') 이벤트 종류
+        select.form-control(name='evt_type')
+          option(value='Select the type of event') Select the type of event
+          option(value='Appearance or Signing') Appearance or Signing
+          option(value='Attraction') Attraction
+          option(value='Camp, Trip, or Retreat') Camp, Trip, or Retreat
+          option(value='Class, Training, or Workshop') Class, Training, or Workshop
+          option(value='Concert or Performance') Concert or Performance
+          option(value='Conference') Conference
+          option(value='Convention') Convention
+          option(value='Dineer or Gala') Dineer or Gala
+          option(value='Festival or Fair') Festival or Fair
+          option(value='Game or Competition') Game or Competition
+          option(value='Meeting or Networking Event') Meeting or Networking Event
+          option(value='Other') Other
+          option(value='Party or Social Gathering') Party or Social Gathering
+          option(value='Race or Endurance Event') Race or Endurance Event
+          option(value='Rally') Rally
+          option(value='Screening') Screening
+          option(value='Seminar or Talk') Seminar or Talk
+          option(value='Tour') Tour
+          option(value='Tournament') Tournament
+          option(value='Tradeshow, Consumer Show, or Expo') Tradeshow, Consumer Show, or Expo
+      .form-group
+        label(for='evt_topic') 이벤트 분야
+        select.form-control(name='evt_topic')
+          option(value='Select a topic') Select a topic
+          option(value='Auto, Boat, Air') Auto, Boat, Air
+          option(value='Charity, Causes') Charity, Causes
+          option(value='Community, Culture') Community, Culture
+          option(value='Family, Education') Family, Education
+          option(value='Fashion, Beauty') Fashion, Beauty
+          option(value='Film, Media, Entertainment') Film, Media, Entertainment
+          option(value='Food, Drink') Food, Drink
+          option(value='Govenment, Politics') Govenment, Politics
+          option(value='Health, Wellness') Health, Wellness
+          option(value='Hobbies, Special Interest') Hobbies, Special Interest
+          option(value='Home, Lifestyle') Home, Lifestyle
+          option(value='Music') Music
+          option(value='Other') Other
+          option(value='Performing, Visual Arts') Performing, Visual Arts
+          option(value='Religion, Spirituality') Religion, Spirituality
+          option(value='School Activities') School Activities
+          option(value='Science, Technology') Science, Technology
+          option(value='Seasonal, Holiday') Seasonal, Holiday
+          option(value='Sports, Fitness') Sports, Fitness
+          option(value='Travel, Outdoor') Travel, Outdoor
+      .form-group
+        label(for='payment') 금액
+        select.form-control(name='payment')
+          option(value='무료') 무료
+          option(value='유료') 유료
+
+      button.btn.btn-primary(type='submit') 수정

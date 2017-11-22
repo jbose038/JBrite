@@ -34,10 +34,30 @@ block content
       .p= event.org_name
       .p /
       .p= event.org_comment
-  hr
-  
-    
-  a.btn.btn-outline-primary(href=`/events/${event._id}/edit`) Edit
+
+  if event.author.id == currentUser.id
+    a.btn.btn-outline-primary(href=`/events/${event._id}/edit`) Edit
+    |
+    |
+    a.btn.btn.need-confirm-btn.btn-outline-danger(href=`/events/${event._id}?_method=DELETE`) Delete
   |
   |
   a.btn.btn-outline-secondary(href='/events') Back
+  hr
+  if event.author.id == currentUser.id && event.numJoined > 0
+    h3 #{event.numJoined} Joined
+    .entrylist.show
+      each entrylist in entrylists
+        .p= entrylist.author.name
+        
+  hr
+  
+  //참가한 자신 목록에서 삭제
+  //each entrylist in entrylists
+    if(entrylist.author.id == currentUser.id)
+      a.btn.btn-sm.need-confirm-btn.btn-outline-danger(href=`/events/${event._id}/entry?_method=DELETE`) Cancel
+  if currentUser
+    form(action=`/events/${event.id}/entry`, method='POST')
+      button.btn.btn-primary(type="submit") Join
+
+  

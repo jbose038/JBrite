@@ -1,5 +1,7 @@
 const express = require('express');
 const EVT = require('../models/event');
+const User = require('../models/user');
+const EntryList = require('../models/entry');
 const router = express.Router();
 const catchErrors = require('../lib/async-error');
 const multer = require('multer');
@@ -42,14 +44,14 @@ function needAuth(req, res, next) {
     res.redirect('/signin');
   }
 }
-
+/*
 router.get('/', needAuth, catchErrors(async (req, res, next) => {
   const events = await EVT.find({});
   res.render('events/list', {events: events});
 }));
+*/
 
-/*
-router.get('/', catchErrors(async (req, res, next) => {
+router.get('/', needAuth, catchErrors(async (req, res, next) => {
   const page = parseInt(req.query.page) || 1;
   const limit = parseInt(req.query.limit) || 10;
 
@@ -68,7 +70,7 @@ router.get('/', catchErrors(async (req, res, next) => {
   });
   res.render('events/list', {events: events, term: term});
 }));
-*/
+
 
 router.get('/new', needAuth, (req, res, next) => {
   res.render('events/new', {messages: req.flash()});
@@ -97,16 +99,42 @@ router.post('/', needAuth, catchErrors(async (req,res,next) => {
     org_name: req.body.org_name,
     org_comment: req.body.org_comment,
     evt_type: req.body.evt_type,
-    evt_topic: req.body.evt_topic
+    evt_topic: req.body.evt_topic,
+    payment: req.body.payment
   });
   await event.save();
   req.flash('success', 'Registered successfully');
   res.redirect('/');
-}))
+}));
 
-router.get('/:id', catchErrors(async (req, res, next) => {
+router.post('/:id/entry', needAuth, catchErrors(async (req,res,body) => {
+  var user = await EntryList.findOne({author: req.user._id});
+  if(user)
+  {
+    req.flash('danger', 'You already joined');
+    return res.redirect('back');
+  }
+
+  user = req.user;
   const event = await EVT.findById(req.params.id);
-  res.render('events/detail', {event: event});
+
+  var entrylist = new EntryList({
+    author: user._id,
+    event: event._id,
+  });
+
+  await entrylist.save();
+  event.numJoined++;
+  await event.save();
+  req.flash('success', 'Successfully joined');
+  res.redirect(`/events/${req.params.id}`);
+}));
+
+router.get('/:id', needAuth, catchErrors(async (req, res, next) => {
+  const event = await EVT.findById(req.params.id).populate('author');
+  const entrylists = await EntryList.find({event: event.id}).populate('author');
+
+  res.render('events/detail', {event: event, entrylists: entrylists});
 }));
 
 router.delete('/:id', needAuth, catchErrors(async (req, res, next) => {
@@ -114,6 +142,14 @@ router.delete('/:id', needAuth, catchErrors(async (req, res, next) => {
   req.flash('success', 'Deleted Successfully.');
   res.redirect('/events');
 }));
+
+/*  참가한 자신 목록에서 삭제
+router.delete('/:id/entry', needAuth, catchErrors(async (req, res, next) => {
+  const entrylist = await EntryList.findOneAndRemove({id: req.user.id});
+  req.flash('success', 'Canceled Successfully.');
+  res.redirect('back');
+}));
+*/
 
 router.get('/:id/edit', needAuth, catchErrors(async (req, res, next) => {
   const event = await EVT.findById(req.params.id);

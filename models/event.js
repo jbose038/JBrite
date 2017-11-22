@@ -14,6 +14,7 @@ var schema = new Schema({
   evt_type: String,
   evt_topic: String,
   payment: String,
+  numJoined: {type: Number, default: 0},
   createdAt: {type: Date, default: Date.now}
 }, {
   toJSON: { virtuals: true},

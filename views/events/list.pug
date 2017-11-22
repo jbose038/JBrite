@@ -12,6 +12,7 @@ block content
     table.table.table-hover
       thead
         tr
+          th 주최자
           th 제목
           th 장소
           th 시작날짜
@@ -20,8 +21,9 @@ block content
           th 주제
           th 금액
       tbody
-        each event in events
+        each event in events.docs
           tr
+            td= event.author.name
             td
               a(href=`/events/${event._id}`)= event.title
             td= event.location
@@ -31,8 +33,11 @@ block content
             td= event.evt_topic
             td= event.payment
             td
-              a.btn.btn-sm.btn-outline-secondary(href=`/events/${event._id}/edit`) 
-                | #[i.fa.fa-pencil] Edit
-              |
-              a.btn.btn-sm.need-confirm-btn.btn-outline-danger(href=`/events/${event._id}?_method=DELETE`)
-                | #[i.fa.fa-trash] Delete
+              if event.author.id == currentUser.id
+                a.btn.btn-sm.btn-outline-secondary(href=`/events/${event._id}/edit`) 
+                  | #[i.fa.fa-pencil] Edit
+                |
+                a.btn.btn-sm.need-confirm-btn.btn-outline-danger(href=`/events/${event._id}?_method=DELETE`)
+                  | #[i.fa.fa-trash] Delete
+    
+    a.btn.btn-primary(href='/events/new') Create Event

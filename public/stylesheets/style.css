@@ -5,8 +5,12 @@ body {
 
 a {
   color: #00B7FF; }
-.btn-block{
-  width: 50%;
+
+.form-signin{
+  width: 430px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 1em;
 }
 .container.detail{
   margin: 0;

@@ -5,10 +5,11 @@ const Schema = mongoose.Schema;
 var schema = new Schema({
   name: {type: String, required: true, trim: true},
   email: {type: String, required: true, index: true, unique: true, trim: true},
-  password: {type: String},
+  password: {type: String, required: true},
   token: {type: String, index: true, unique: true, trim: true},
   facebook: {id: String, token: String, photo: String},
   kakao: {id:String, token: String},
+  isAdmin: {type: Boolean, required: true, default: false},
   createdAt: {type: Date, default: Date.now}
 }, {
   toJSON: { virtuals: true},

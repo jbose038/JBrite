@@ -13,9 +13,8 @@ var passport = require('passport');
 
 var index = require('./routes/index');
 var users = require('./routes/users');
-var organize = require('./routes/organize');
+var admin = require('./routes/admin');
 var evt = require('./routes/events');
-//var admin_user = require('./routes/admin');
 var passportConfig = require('./lib/passport-config');
 
 var app = express();
@@ -87,8 +86,7 @@ app.use(function(req, res, next) {
 app.use('/', index);
 app.use('/users', users);
 app.use('/events',evt);
-app.use('/organize',organize);
-//app.use('/admin',admin_user);
+app.use('/admin',admin);
 require('./routes/auth')(app,passport);
 
 

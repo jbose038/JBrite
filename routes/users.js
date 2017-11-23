@@ -11,6 +11,14 @@ function needAuth(req, res, next) {
     res.redirect('/signin');
   }
 }
+function needAdmin(req,res,next) {
+  if(req.user && req.user.isAdmin)
+      next();
+  else{
+      req.flash('danger', 'NOT Admin user');
+      res.redirect('/');
+  }
+}
 
 function validateForm(form, options) {
   var name = form.name || "";
@@ -41,8 +49,8 @@ function validateForm(form, options) {
   return null;
 }
 
-/* GET users listing. */
-router.get('/', needAuth, catchErrors(async (req, res, next) => {
+/* GET users listing for only ADMIN */
+router.get('/', needAuth, needAdmin, catchErrors(async (req, res, next) => {
   const users = await User.find({});
   res.render('users/list', {users: users});
 }));
@@ -107,10 +115,17 @@ router.post('/', catchErrors(async (req, res, next) => {
     req.flash('danger', 'Email address already exists.');
     return res.redirect('back');
   }
+  if(req.body.name.trim() == 'admin')
+    user = new User({
+      name: req.body.name,
+      email: req.body.email,
+      isAdmin: true
+    });
+  else
   user = new User({
     name: req.body.name,
     email: req.body.email,
-  });
+    });
   user.password = await user.generateHash(req.body.password);
   await user.save();
   req.flash('success', 'Registered successfully. Please sign in.');

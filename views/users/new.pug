@@ -2,8 +2,8 @@ extends ../layout
 
 block content
   .container
-    h1.main-title Register
-    form(action='/users', method='POST')
+    form.form-signup(action='/users', method='POST')
+      h1.main-title Register
       .form-group
         label(for='name') Name
         input.form-control(type='text', id='name', name='name', placeholder='Your name')

@@ -12,7 +12,6 @@ block content
     table.table.table-hover
       thead
         tr
-          th 등록자
           th 제목
           th 장소
           th 시작날짜
@@ -23,7 +22,6 @@ block content
       tbody
         each event in events.docs
           tr
-            td= event.author.name
             td
               a(href=`/events/${event._id}`)= event.title
             td= event.location
@@ -33,7 +31,7 @@ block content
             td= event.evt_topic
             td= event.payment
             td
-              if event.author.id == currentUser.id
+              if currentUser.isAdmin
                 a.btn.btn-sm.btn-outline-secondary(href=`/events/${event._id}/edit`) 
                   | #[i.fa.fa-pencil] Edit
                 |
@@ -42,3 +40,7 @@ block content
                   | #[i.fa.fa-trash] Delete
     
     a.btn.btn-primary(href='/events/new') Create Event
+    |
+    |
+    if currentUser.isAdmin
+      a.btn.btn-outline-secondary(href='../admin') Back to Admin Page

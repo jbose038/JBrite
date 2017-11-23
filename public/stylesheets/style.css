@@ -14,7 +14,7 @@ a {
 
 .header > .navbar {
   background-color: #16c7c7 !important; }
-.form-signin{
+.form-signin, .form-signup{
   width: 430px;
   margin: 0 auto;
   text-align: center;
@@ -26,17 +26,24 @@ a {
   padding-left: 30%;
 }
 .container.detail{
-  margin: 0;
+  margin: auto;
   padding: 0;
 }
-.container.title{
+.title{
   text-align: center;
 }
-.container.event{
+.event{
   font-size: 1.5em;
   display: inline-block;
   width: 500px;
   padding: 2% 0% 2% 0%;
+  text-align: center;
+}
+.detail-buttons{
+  display: block;
+  margin-left: 3em;
+}
+h3.msg{
   text-align: center;
 }
 label.evt_type{
@@ -51,5 +58,3 @@ select{
 #date_start, #date_end{
   width: 200px;
 }
-
-/*# sourceMappingURL=style.css.map */

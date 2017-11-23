@@ -44,12 +44,14 @@ function needAuth(req, res, next) {
     res.redirect('/signin');
   }
 }
-/*
-router.get('/', needAuth, catchErrors(async (req, res, next) => {
-  const events = await EVT.find({});
-  res.render('events/list', {events: events});
-}));
-*/
+function needAdmin(req, res, next) {
+  if (req.isAdmin) {
+      next();
+  } else {
+    req.flash('danger', 'NOT ADMIN User');
+    res.redirect('/');
+  }
+}
 
 router.get('/', needAuth, catchErrors(async (req, res, next) => {
   const page = parseInt(req.query.page) || 1;
@@ -72,9 +74,9 @@ router.get('/', needAuth, catchErrors(async (req, res, next) => {
 }));
 
 
-router.get('/new', needAuth, (req, res, next) => {
+router.get('/new', needAuth, catchErrors(async (req, res, next) => {
   res.render('events/new', {messages: req.flash()});
-});
+}));
 
 router.post('/', needAuth, catchErrors(async (req,res,next) => {
   const err = validateEvent(req.body);

@@ -2,65 +2,71 @@ extends ../layout
 
 block content
   .container.detail
-    .container.title
+    .title
       h1.main-title= event.title
     hr
-    .container.event.location
+    .event.author
+      h3 등록자
+      .p= event.author.name
+    
+    .event.location
       h3 장소
       .p= event.location
     
-    .container.event.date
+    .event.date
       h3 날짜
       .p= event.date_start +' ~ ' + event.date_end
 
-    .container.event.desc
+    .event.desc
       h3 상세 설명
       .p= event.description
 
-    .container.event.payment
+    .event.payment
       h3 가격
       .p= event.payment
 
-    .container.event.evt_type
-      h3 이벤트 종류
-      .p= event.evt_type
+    .event.evt_type
+      h3 종류 / 주제
+      .p= event.evt_type + ' / ' + event.evt_topic
 
-    .container.event.evt_topic
-      h3 이벤트 주제
-      .p= event.evt_topic
-    
-    .container.event.org_nameNcomment
-      h3 등록 조직의 이름 / 상세설명
+    .event.evt_topic
+      h3 등록 조직의 이름
       .p= event.org_name
-      .p /
+    
+    .event.org_nameNcomment
+      h3 등록 조직의 상세설명
       .p= event.org_comment
 
-  a.btn.btn-outline-secondary(href='/events') Back
-  |
-  |
-  if event.author.id == currentUser.id
-    a.btn.btn-outline-primary(href=`/events/${event._id}/edit`) Edit
-    |
-    |
-    a.btn.btn.need-confirm-btn.btn-outline-danger(href=`/events/${event._id}?_method=DELETE`) Delete
+    .detail-buttons
+      a.btn.btn-outline-secondary(href='/events') Back
+      |
+      |
+      if (event.author.id == currentUser.id) || currentUser.isAdmin
+        a.btn.btn-outline-primary(href=`/events/${event._id}/edit`) Edit
+        |
+        |
+        a.btn.btn.need-confirm-btn.btn-outline-danger(href=`/events/${event._id}?_method=DELETE`) Delete
 
-  hr
-  if event.numJoined > 0
-    h3 #{event.numJoined} 명 현재 참여중
-    if event.author.id == currentUser.id
-      .entrylist.show
-        each entrylist in entrylists
-          .p= entrylist.author.name
-    else
-      .p 해당 이벤트 등록자만 신청목록을 확인 할 수 있습니다.
-  hr
-  
-  //참가한 자신 목록에서 삭제
-  //each entrylist in entrylists
-    if(entrylist.author.id == currentUser.id)
-      a.btn.btn-sm.need-confirm-btn.btn-outline-danger(href=`/events/${event._id}/entry?_method=DELETE`) Cancel
-  if currentUser
-    form(action=`/events/${event.id}/entry`, method='POST')
-      button.btn.btn-primary(type="submit") Join
-
-  
+    hr
+    .container.joined
+      if event.numJoined > 0
+        h5 #{event.numJoined} 명 현재 참여중
+        if event.author.id == currentUser.id
+          .entrylist.show
+            each entrylist in entrylists
+              .p= entrylist.author.name
+        else
+          h3.msg 해당 이벤트 등록자만 신청목록을 확인 할 수 있습니다.
+    hr
+    
+    //참가한 자신 목록에서 삭제
+    //each entrylist in entrylists
+      if(entrylist.author.id == currentUser.id)
+        a.btn.btn-sm.need-confirm-btn.btn-outline-danger(href=`/events/${event._id}/entry?_method=DELETE`) Cancel
+    if !currentUser.isAdmin && event.author.id != currentUser.id
+      form(action=`/events/${event.id}/entry`, method='POST')
+        button.btn.btn-primary(type="submit") Join
+    else if !currentUser.isAdmin && event.author.id == currentUser.id
+      h3.msg 해당 이벤트 등록자는 참가신청이 불가능합니다.
+    else if currentUser.isAdmin
+      h3.msg 관리자상태입니다. 이벤트 관리만 할 수 있습니다.

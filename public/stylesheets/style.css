@@ -58,3 +58,10 @@ select{
 #date_start, #date_end{
   width: 200px;
 }
+
+.form-control#payment{
+  width: 100px;
+}
+#maxJoined{
+  width: 100px;
+}

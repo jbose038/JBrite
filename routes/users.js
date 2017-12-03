@@ -34,7 +34,7 @@ function validateForm(form, options) {
     return 'Email is required.';
   }
 
-  if (!form.password && options.needPassword) {
+  if (!form.password || options.needPassword) {
     return 'Password is required.';
   }
 
@@ -98,12 +98,12 @@ router.delete('/:id', needAuth, catchErrors(async (req, res, next) => {
   res.redirect('/users');
 }));
 
-router.get('/:id', catchErrors(async (req, res, next) => {
+router.get('/:id', needAuth, catchErrors(async (req, res, next) => {
   const user = await User.findById(req.params.id);
   res.render('users/show', {user: user});
 }));
 
-router.post('/', catchErrors(async (req, res, next) => {
+router.post('/', needAuth, catchErrors(async (req, res, next) => {
   var err = validateForm(req.body, {needPassword: true});
   if (err) {
     req.flash('danger', err);

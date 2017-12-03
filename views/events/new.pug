@@ -75,8 +75,18 @@ block content
             option(value='Travel, Outdoor') Travel, Outdoor
         .form-group
           label(for='payment') 금액
-          select.form-control(name='payment')
+          select.form-control(id='sel_payment', name='payment')
             option(value='무료') 무료
             option(value='유료') 유료
+        .form-group
+          label(for='payment') 유료금액 설정
+          input.form-control(type='text', id='payment', name='payment',placeholder='참가 금액 설정', disabled=true)
+          .p.won 원
+        .form-group
+          label(for='maxJoined') 최대 참가 인원
+          input.form-control(type='number', id='maxJoined', name='maxJoined')
+        //.form-group
+          label(for='img') upload image
+          input.form-control(type="file", name="img")
 
         button.btn.btn-primary(type='submit') 생성

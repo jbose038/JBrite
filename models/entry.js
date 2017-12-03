@@ -4,6 +4,8 @@ const Schema = mongoose.Schema;
 
 var schema = new Schema({
     author: { type: Schema.Types.ObjectId, ref: 'User' },
+    org: {type:String},
+    reason: {type:String},
     event: { type: Schema.Types.ObjectId, ref: 'EVT' },
     createdAt: {type: Date, default: Date.now}
   }, {

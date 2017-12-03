@@ -36,7 +36,8 @@ router.post('', catchErrors(async (req, res, next) => {
     org_comment: req.body.org_comment,
     evt_type: req.body.evt_type,
     evt_topic: req.body.evt_topic,
-    payment: req.body.payment
+    payment: req.body.payment,
+    maxJoined: req.body.maxJoined
   });
   await event.save();
   res.json(event)
@@ -61,6 +62,7 @@ router.put('/:id', catchErrors(async (req, res, next) => {
   evt_type: req.body.evt_type;
   evt_topic: req.body.evt_topic;
   payment: req.body.payment;
+  maxJoined: req.body.maxJoined;
   await question.save();
   res.json(question);
 }));

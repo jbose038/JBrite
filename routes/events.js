@@ -15,6 +15,7 @@ function validateEvent(form, options) {
   var org_comment = form.org_comment || "";
   var evt_type = form.evt_type || "Select the type of event";
   var evt_topic = form.evt_topic || "Select a topic";
+  var maxJoined = form.maxJoined || 0;
 
   title = title.trim();
   location = location.trim();
@@ -32,8 +33,22 @@ function validateEvent(form, options) {
   if (!org_comment) {return 'organization description is required.';}
   if (evt_type == "Select the type of event") {return 'event type is required.';}
   if (evt_topic == "Select a topic") {return 'event topic is required.';}
+  if (maxJoined < 1){return 'Max Join value should be at least 1'}
 
   return null;
+}
+function validateSurvey(req,res,next) {
+  var org = req.body.org || "";
+  var reason = req.body.reason || "";
+
+  org = org.trim();
+  reason = reason.trim();
+
+  if (!org || !reason)
+    {
+      req.flash('danger', 'NOT ADMIN User');
+      res.redirect('/');
+    }
 }
 
 function needAuth(req, res, next) {
@@ -102,14 +117,15 @@ router.post('/', needAuth, catchErrors(async (req,res,next) => {
     org_comment: req.body.org_comment,
     evt_type: req.body.evt_type,
     evt_topic: req.body.evt_topic,
-    payment: req.body.payment
+    payment: req.body.payment,
+    maxJoined: req.body.maxJoined
   });
   await event.save();
   req.flash('success', 'Registered successfully');
   res.redirect('/');
 }));
 
-router.post('/:id/entry', needAuth, catchErrors(async (req,res,body) => {
+router.post('/:id/entry', needAuth, validateSurvey, catchErrors(async (req,res,body) => {
 
   const event = await EVT.findById(req.params.id);
   var user = await EntryList.findOne({author: req.user._id, event: event});
@@ -120,12 +136,16 @@ router.post('/:id/entry', needAuth, catchErrors(async (req,res,body) => {
   }
 
   user = req.user;
+  user.survey = true;
 
   var entrylist = new EntryList({
     author: user._id,
+    org: req.body.org,
+    reason: req.body.reason,
     event: event._id,
   });
 
+  await user.save();
   await entrylist.save();
   event.numJoined++;
   await event.save();

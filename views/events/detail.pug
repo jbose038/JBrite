@@ -49,23 +49,35 @@ block content
 
     hr
     .container.joined
-      if event.numJoined > 0
-        h5 #{event.numJoined} 명 현재 참여중
-        if event.author.id == currentUser.id
-          .entrylist.show
-            each entrylist in entrylists
-              .p= entrylist.author.name
-        else
-          h3.msg 해당 이벤트 등록자만 신청목록을 확인 할 수 있습니다.
+      h5 현재 이벤트 정원 #{event.maxJoined} 중 #{event.numJoined} 명 현재 참여중
+      h7 (#{event.maxJoined - event.numJoined}명 남았습니다) 
+      if event.author.id == currentUser.id
+        .entrylist.show
+          each entrylist in entrylists
+            .p= entrylist.author.name + ' / ' + entrylist.org + ' / ' + entrylist.reason
+      else
+        h3.msg 해당 이벤트 등록자만 신청목록을 확인 할 수 있습니다.
     hr
     
     //참가한 자신 목록에서 삭제
     //each entrylist in entrylists
       if(entrylist.author.id == currentUser.id)
         a.btn.btn-sm.need-confirm-btn.btn-outline-danger(href=`/events/${event._id}/entry?_method=DELETE`) Cancel
-    if !currentUser.isAdmin && event.author.id != currentUser.id
-      form(action=`/events/${event.id}/entry`, method='POST')
-        button.btn.btn-primary(type="submit") Join
+
+    
+    if !currentUser.isAdmin && (event.author.id != currentUser.id) && (event.maxJoined > event.numJoined)
+      if !currentUser.survey
+        h5 참가하려면 설문제출을 해주시기 바랍니다.
+        form(action=`/events/${event.id}/entry`, method='POST')
+          .form-group
+            label(for='org') 본인의 소속
+            input.form-control.input-lg(type='text', id='org', name='org', placeholder='소속을 간단히 작성해주세요')
+          .form-group
+            label(for='reason') 참여하게 된 이유
+            input.form-control.input-lg(type='text', id='reason', name='reason', placeholder='참여 이유를 간단히 작성해주세요')
+          button.btn.btn-primary(type="submit") 참가신청!
+      else
+        h5 이미 참가 신청 되었습니다.
     else if !currentUser.isAdmin && event.author.id == currentUser.id
       h3.msg 해당 이벤트 등록자는 참가신청이 불가능합니다.
     else if currentUser.isAdmin

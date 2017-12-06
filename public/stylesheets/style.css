@@ -46,21 +46,29 @@ a {
 h3.msg{
   text-align: center;
 }
+label{
+  font-size: 1.5em;
+}
 label.evt_type{
   width: 400px;
 }
 select{
   display: block;
 }
+#payment, #maxJoined{
+  width: 200px;
+  margin: 0.5em 0 0 0;
+  display: inline-block;
+}
+#won, #people{
+  font-size: 1.5em;
+  display: inline-block;
+}
 .form-control{
   width: 400px;
 }
 #date_start, #date_end{
   width: 200px;
-}
-
-.form-control#payment{
-  width: 100px;
 }
 #maxJoined{
   width: 100px;

@@ -11,12 +11,28 @@ block content
 
       dt.col-sm-3 Created At
       dd.col-sm-9= user.createdAt
+
+      dt.col-sm-3 Connected Kakao / Facebook account: 
+      dd.col-sm-9
+        if user.kakao.id
+          p Kakao
+        if user.facebook.id
+          if user.kakao.id
+            p= ' / '
+          p Facebook
+        if !user.kakao.id && !user.facebook.id
+          p Not Connected
+      
       
       if user.facebook.id
         dt.col-sm-3 Facebook
         dd.col-sm-9
           img.img-fluid.rounded-circle(src= user.facebook.photo)
 
+      if user.kakao.id
+        dt.col-sm-3 Kakao
+        dd.col-sm-9
+          img.img-fluid.rounded-circle(src= '/images/kprofile.png')
     hr
     p
       if currentUser.isAdmin

@@ -3,7 +3,7 @@ extends ../layout
 block content
     .input-container
       h1 이벤트 생성
-      form(action='/events', method='POST')
+      form(action='/events', method='POST', enctype="multipart/form-data")
         .form-group
           label(for='title') 제목
           input.form-control(type='text', id='title', name='title', placeholder='이벤트의 제목을 입력하세요.')
@@ -74,18 +74,19 @@ block content
             option(value='Sports, Fitness') Sports, Fitness
             option(value='Travel, Outdoor') Travel, Outdoor
         .form-group
-          label(for='payment') 금액
-          select.form-control(id='sel_payment', name='payment')
+          label(for='sel_payment') 금액
+          select.form-control(id='sel_payment', name='sel_payment')
             option(value='무료') 무료
             option(value='유료') 유료
         .form-group
-          label(for='payment') 유료금액 설정
+          .label(for='payment') 유료금액 설정 [미설정 시 0원]
           input.form-control(type='text', id='payment', name='payment',placeholder='참가 금액 설정', disabled=true)
-          .p.won 원
+          p#won 원
         .form-group
-          label(for='maxJoined') 최대 참가 인원
-          input.form-control(type='number', id='maxJoined', name='maxJoined')
-        //.form-group
+          .label(for='maxJoined') 최대 참가 인원
+          input.form-control(type='number', id='maxJoined', name='maxJoined',min='1')
+          p#people 명
+        .form-group
           label(for='img') upload image
           input.form-control(type="file", name="img")
 

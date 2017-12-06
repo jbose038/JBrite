@@ -5,6 +5,24 @@ const EntryList = require('../models/entry');
 const router = express.Router();
 const catchErrors = require('../lib/async-error');
 const multer = require('multer');
+const fs = require('fs-extra');
+const path = require('path');
+
+const mimetypes = {
+  "image/jpeg" : "jpg",
+  "image/gif" : "gif",
+  "image/png" : "png"
+};
+const upload = multer({
+  dest: 'tmp',
+  fileFilter: (req, file, cb) => {
+    var ext = mimetypes[file.mimetype];
+    if (!ext){
+      return cb(new Error('Only image files are allowed!'), false);
+    }
+    cb(null, true);
+  }
+})
 
 function validateEvent(form, options) {
   var title = form.title || "";
@@ -45,10 +63,14 @@ function validateSurvey(req,res,next) {
   reason = reason.trim();
 
   if (!org || !reason)
-    {
-      req.flash('danger', 'NOT ADMIN User');
-      res.redirect('/');
-    }
+  {
+    req.flash('danger', 'fill the body');
+    res.redirect('/');
+  }
+  else
+  {
+    next();
+  }
 }
 
 function needAuth(req, res, next) {
@@ -67,6 +89,8 @@ function needAdmin(req, res, next) {
     res.redirect('/');
   }
 }
+
+
 
 router.get('/', needAuth, catchErrors(async (req, res, next) => {
   const page = parseInt(req.query.page) || 1;
@@ -93,7 +117,7 @@ router.get('/new', needAuth, catchErrors(async (req, res, next) => {
   res.render('events/new', {messages: req.flash()});
 }));
 
-router.post('/', needAuth, catchErrors(async (req,res,next) => {
+router.post('/', needAuth, upload.single('img'), catchErrors(async (req,res,next) => {
   const err = validateEvent(req.body);
   if (err) {
     req.flash('danger', err);
@@ -120,6 +144,13 @@ router.post('/', needAuth, catchErrors(async (req,res,next) => {
     payment: req.body.payment,
     maxJoined: req.body.maxJoined
   });
+  if (req.file) {
+    const dest = path.join(__dirname, '../public/images/uploads/');
+    console.log("File ->", req.file);
+    const filename = req.file.filename + "." + mimetypes[req.file.mimetype];
+    await fs.move(req.file.path, dest + filename);
+    event.img = "/images/uploads/" + filename;
+  }
   await event.save();
   req.flash('success', 'Registered successfully');
   res.redirect('/');
@@ -150,7 +181,8 @@ router.post('/:id/entry', needAuth, validateSurvey, catchErrors(async (req,res,b
   event.numJoined++;
   await event.save();
   req.flash('success', 'Successfully joined');
-  res.redirect(`/events/${req.params.id}`);
+  //res.redirect(`/events/${req.params.id}`);
+  res.redirect('back');
 }));
 
 router.get('/:id', needAuth, catchErrors(async (req, res, next) => {

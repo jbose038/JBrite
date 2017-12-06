@@ -13,7 +13,7 @@ var schema = new Schema({
   org_comment: String,
   evt_type: String,
   evt_topic: String,
-  payment: String,
+  payment: {type: Number, default: 0},
   numJoined: {type: Number, default: 0},
   maxJoined: Number,
   img: {type: String},

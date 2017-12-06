@@ -4,6 +4,8 @@ block content
   .container.detail
     .title
       h1.main-title= event.title
+      if event.img
+        img.img-fluid(src= event.img)
     hr
     .event.author
       h3 등록자
@@ -23,7 +25,10 @@ block content
 
     .event.payment
       h3 가격
-      .p= event.payment
+      if !event.payment
+        .p 무료
+      else
+        .p= event.payment + '원'
 
     .event.evt_type
       h3 종류 / 주제
@@ -50,13 +55,18 @@ block content
     hr
     .container.joined
       h5 현재 이벤트 정원 #{event.maxJoined} 중 #{event.numJoined} 명 현재 참여중
-      h7 (#{event.maxJoined - event.numJoined}명 남았습니다) 
+      h7 (#{event.maxJoined - event.numJoined}명 남았습니다)
       if event.author.id == currentUser.id
         .entrylist.show
           each entrylist in entrylists
             .p= entrylist.author.name + ' / ' + entrylist.org + ' / ' + entrylist.reason
-      else
-        h3.msg 해당 이벤트 등록자만 신청목록을 확인 할 수 있습니다.
+      else 
+        .p 신청자 / 소속 / 참여한 이유
+        .entrylist.show
+          each entrylist in entrylists
+            if entrylist.author.name == currentUser.name
+              .p= entrylist.author.name + ' / ' + entrylist.org + ' / ' + entrylist.reason
+        h3.msg 해당 이벤트 등록자만 전체 신청목록을 확인 할 수 있습니다.
     hr
     
     //참가한 자신 목록에서 삭제
@@ -78,6 +88,13 @@ block content
           button.btn.btn-primary(type="submit") 참가신청!
       else
         h5 이미 참가 신청 되었습니다.
+        a.btn.btn-outline-secondary#review 후기 남기기
+
+        form(action=`/events/${event.id}/review`, method='POST')
+          .post-review
+            .form-group
+              input.form-control.input-lg(type='text', id='review', name='review', placeholder='후기를 간단히 작성해주세요')
+
     else if !currentUser.isAdmin && event.author.id == currentUser.id
       h3.msg 해당 이벤트 등록자는 참가신청이 불가능합니다.
     else if currentUser.isAdmin

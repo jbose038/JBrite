@@ -29,7 +29,11 @@ block content
             td= event.date_end
             td= event.evt_type
             td= event.evt_topic
-            td= event.payment
+            td 
+              if event.payment
+                p= event.payment + '원'
+              else
+                p 무료
             td
               if currentUser.isAdmin
                 a.btn.btn-sm.btn-outline-secondary(href=`/events/${event._id}/edit`) 

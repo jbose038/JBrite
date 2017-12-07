@@ -53,49 +53,72 @@ block content
         a.btn.btn.need-confirm-btn.btn-outline-danger(href=`/events/${event._id}?_method=DELETE`) Delete
 
     hr
+
+    .container.review
+      h5 후기
+      .entrylist.show
+        each entrylist in entrylists
+          if entrylist.review
+            hr
+            .p=entrylist.author.name + ' : ' + entrylist.review
+            if(entrylist.answer)
+              .p='ㄴ답변 : '+ entrylist.answer
+            else
+              if event.author.id == currentUser.id
+                form(action=`/events/${event.id}/answer`, method='POST')
+                  .form-group
+                    input.form-control.input-lg(type='text', id='answer', name='answer', placeholder='답변을 간단히 작성해주세요')
+                  button.btn.btn-primary#review(type="submit") 답변 남기기
+
+                a.btn.btn.need-confirm-btn.btn-outline-danger(href=`/events/${event._id}/answer?_method=DELETE`) Delete
+
+    hr
     .container.joined
       h5 현재 이벤트 정원 #{event.maxJoined} 중 #{event.numJoined} 명 현재 참여중
       h7 (#{event.maxJoined - event.numJoined}명 남았습니다)
-      if event.author.id == currentUser.id
-        .entrylist.show
+
+      if event.author == currentuser
+        .p 신청자 / 소속 / 참여한 이유
           each entrylist in entrylists
             .p= entrylist.author.name + ' / ' + entrylist.org + ' / ' + entrylist.reason
-      else 
-        .p 신청자 / 소속 / 참여한 이유
-        .entrylist.show
-          each entrylist in entrylists
-            if entrylist.author.name == currentUser.name
-              .p= entrylist.author.name + ' / ' + entrylist.org + ' / ' + entrylist.reason
-        h3.msg 해당 이벤트 등록자만 전체 신청목록을 확인 할 수 있습니다.
+      h3.msg 해당 이벤트 등록자만 전체 신청목록을 확인 할 수 있습니다.
     hr
-    
-    //참가한 자신 목록에서 삭제
-    //each entrylist in entrylists
-      if(entrylist.author.id == currentUser.id)
-        a.btn.btn-sm.need-confirm-btn.btn-outline-danger(href=`/events/${event._id}/entry?_method=DELETE`) Cancel
 
     
     if !currentUser.isAdmin && (event.author.id != currentUser.id) && (event.maxJoined > event.numJoined)
-      if !currentUser.survey
-        h5 참가하려면 설문제출을 해주시기 바랍니다.
-        form(action=`/events/${event.id}/entry`, method='POST')
+      each entrylist in entrylists
+        if entrylist.author != currentUser
+          a.btn.btn-outline-primary(href=`/events/${event._id}/entry?_method=POST`) 신청
+        if entrylist.author.id == currentUser.id
+          a.btn.btn-sm.need-confirm-btn.btn-outline-danger(href=`/events/${event._id}/entry?_method=DELETE`) 신청취소
+    each entrylist in entrylists
+      if (entrylist.author == currentUser) && !entrylist.survey
+        h5 참가신청했다면 간단한 설문을 제출을 해 주시기 바랍니다.
+        form(action=`/events/${event.id}/survey`, method='POST')
           .form-group
             label(for='org') 본인의 소속
             input.form-control.input-lg(type='text', id='org', name='org', placeholder='소속을 간단히 작성해주세요')
           .form-group
             label(for='reason') 참여하게 된 이유
             input.form-control.input-lg(type='text', id='reason', name='reason', placeholder='참여 이유를 간단히 작성해주세요')
-          button.btn.btn-primary(type="submit") 참가신청!
+          button.btn.btn-primary(type="submit") 제출
       else
         h5 이미 참가 신청 되었습니다.
-        a.btn.btn-outline-secondary#review 후기 남기기
 
-        form(action=`/events/${event.id}/review`, method='POST')
-          .post-review
+        if entrylist.author.name == currentUser.name && entrylist.review 
+          h5 이미 리뷰를 작성했습니다.
+        else
+          form(action=`/events/${event.id}/review`, method='POST')
             .form-group
               input.form-control.input-lg(type='text', id='review', name='review', placeholder='후기를 간단히 작성해주세요')
+              button.btn.btn-primary#review(type="submit") 후기 남기기
+  
+    //참가한 자신 목록에서 삭제
+    
+      
+    
 
-    else if !currentUser.isAdmin && event.author.id == currentUser.id
-      h3.msg 해당 이벤트 등록자는 참가신청이 불가능합니다.
-    else if currentUser.isAdmin
-      h3.msg 관리자상태입니다. 이벤트 관리만 할 수 있습니다.
+      if !currentUser.isAdmin && event.author.id == currentUser.id
+        h3.msg 해당 이벤트 등록자는 참가신청이 불가능합니다.
+      if currentUser.isAdmin
+        h3.msg 관리자상태입니다. 이벤트 관리만 할 수 있습니다.

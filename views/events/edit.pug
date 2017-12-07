@@ -1,14 +1,15 @@
 extends ../layout
 
 block content
+  .input-container
     h1 이벤트 수정
     form(action=`/events/${event._id}?_method=PUT`, method='POST')
       .form-group
         label(for='title') 제목
-        input.form-control(type='text', id='title', name='title', placeholder='이벤트의 제목을 입력하세요.', value=event.title)
+        input.form-control(type='text', id='title', name='title', placeholder=event.title, disabled)
       .form-group
         label(for='location') 장소
-        input.form-control(type='text', id='location', name='location', placeholder='장소를 입력하세요.', value=event.location)
+        input.form-control(type='text', id='location', name='location', placeholder=event.location)
       .form-group
         label(for='date_start') 시작할 날짜
         input.form-control(type='date', id='date_start', name='date_start', placeholder='')
@@ -17,13 +18,13 @@ block content
         input.form-control(type='date', id='date_end', name='date_end', placeholder='')
       .form-group
         label(for='description') 상세 설명
-        input.form-control.input-lg(type='text', id='description', name='description', placeholder='상세설명을 입력하세요.', value=event.description)
+        input.form-control.input-lg(type='text', id='description', name='description', placeholder=event.description)
       .form-group
         label(for='org_name') 등록조직 이름
-        input.form-control.input-lg(type='text', id='org_name', name='org_name', placeholder='등록할 조직의 이름을 입력하세요.', value=event.org_name)
+        input.form-control.input-lg(type='text', id='org_name', name='org_name', placeholder=event.org_name)
       .form-group
         label(for='org_comment') 등록조직 상세 설명
-        textarea.form-control(row='5', name='org_comment', placeholder='등록할 조직에 대한 설명을 입력하세요')
+        textarea.form-control(row='5', name='org_comment', placeholder=event.org_comment)
       .form-group
         label(for='evt_type') 이벤트 종류
         select.form-control(name='evt_type')
@@ -73,16 +74,20 @@ block content
           option(value='Sports, Fitness') Sports, Fitness
           option(value='Travel, Outdoor') Travel, Outdoor
       .form-group
-        label(for='payment') 금액
-        select.form-control(name='payment')
+        label(for='sel_payment') 금액
+        select.form-control(id='sel_payment', name='sel_payment')
           option(value='무료') 무료
           option(value='유료') 유료
       .form-group
-        label(for='payment') 금액
-        input.form-control(type='text', id='payment', name='payment',placeholder='참가 금액 설정')
-
+        .label(for='payment') 유료금액 설정 [미설정 시 0원]
+        input.form-control(type='text', id='payment', name='payment',placeholder='참가 금액 설정', disabled=true)
+        p#won 원
       .form-group
-        label(for='maxJoined') 최대 참가 인원
-        input.form-control(type='text', id='maxJoined', name='maxJoined')
+        .label(for='maxJoined') 최대 참가 인원
+        input.form-control(type='number', id='maxJoined', name='maxJoined',min='1')
+        p#people 명
+      .form-group
+        label(for='img') upload image
+        input.form-control(type="file", name="img")
 
       button.btn.btn-primary(type='submit') 수정

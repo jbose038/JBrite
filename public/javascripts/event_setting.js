@@ -16,9 +16,3 @@ $(function() {
       $('#payment').prop({'disabled':true});
   });
 });
-
-$(function() {
-  $('#review').click(function() {
-    alert('hi');
-  });
-});

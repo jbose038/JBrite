@@ -7,6 +7,9 @@ var schema = new Schema({
     org: {type:String},
     reason: {type:String},
     event: { type: Schema.Types.ObjectId, ref: 'EVT' },
+    survey: {type: Boolean, default: false},
+    review: {type:String},
+    answer: {type:String},
     createdAt: {type: Date, default: Date.now}
   }, {
     toJSON: { virtuals: true},

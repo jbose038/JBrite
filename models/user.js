@@ -11,7 +11,6 @@ var schema = new Schema({
   facebook: {id: String, token: String, photo: String},
   kakao: {id:String, token: String, photo:String},
   isAdmin: {type: Boolean, required: true, default: false},
-  survey: {type: Boolean, default: false},
   createdAt: {type: Date, default: Date.now}
 }, {
   toJSON: { virtuals: true},

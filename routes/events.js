@@ -101,7 +101,9 @@ router.get('/', needAuth, catchErrors(async (req, res, next) => {
   if (term) {
     query = {$or: [
       {title: {'$regex': term, '$options': 'i'}},
-      {location: {'$regex': term, '$options': 'i'}}
+      {location: {'$regex': term, '$options': 'i'}},
+      {evt_type: {'$regex': term, '$options': 'i'}},
+      {evt_topic: {'$regex': term, '$options': 'i'}}
     ]};
   }
   const events = await EVT.paginate(query, {
@@ -155,32 +157,78 @@ router.post('/', needAuth, upload.single('img'), catchErrors(async (req,res,next
   req.flash('success', 'Registered successfully');
   res.redirect('/');
 }));
+router.post('/:id/entry', needAuth, catchErrors(async (req,res,body) => {
+  
+    const event = await EVT.findById(req.params.id);
+    var user = await EntryList.findOne({author: req.user._id, event: event});
+    if(user)
+    {
+      req.flash('danger', 'You already joined');
+      return res.redirect('back');
+    }
+  
+    user = req.user;
+  
+    var entrylist = new EntryList({
+      author: user._id,
+      event: event
+    });
 
-router.post('/:id/entry', needAuth, validateSurvey, catchErrors(async (req,res,body) => {
+    event.numJoined++;
+    await user.save();
+    await entrylist.save();
+    await event.save();
+    req.flash('success', 'Successfully joined');
+    //res.redirect(`/events/${req.params.id}`);
+    res.redirect('back');
+  }));
+router.post('/:id/survey', needAuth, validateSurvey, catchErrors(async (req,res,body) => {
 
   const event = await EVT.findById(req.params.id);
   var user = await EntryList.findOne({author: req.user._id, event: event});
-  if(user)
-  {
-    req.flash('danger', 'You already joined');
-    return res.redirect('back');
-  }
 
-  user = req.user;
   user.survey = true;
-
-  var entrylist = new EntryList({
-    author: user._id,
-    org: req.body.org,
-    reason: req.body.reason,
-    event: event._id,
-  });
+  user.org = req.body.org;
+  user.reason = req.body.reason;
 
   await user.save();
-  await entrylist.save();
-  event.numJoined++;
-  await event.save();
   req.flash('success', 'Successfully joined');
+  //res.redirect(`/events/${req.params.id}`);
+  res.redirect('back');
+}));
+router.post('/:id/review', needAuth, catchErrors(async (req,res,body) => {
+  
+  const event = await EVT.findById(req.params.id);
+  var user = await EntryList.findOne({author: req.user._id, event: event});
+
+  user.review = req.body.review;
+
+  await user.save();
+  req.flash('success', 'Successfully registered');
+  //res.redirect(`/events/${req.params.id}`);
+  res.redirect('back');
+}));
+router.post('/:id/answer', needAuth, catchErrors(async (req,res,body) => {
+  
+  const event = await EVT.findById(req.params.id);
+  var ety = await EntryList.findOne({author: req.user._id, event: event});
+  ety.answer = req.body.answer;
+
+  await ety.save();
+  await event.save();
+  req.flash('success', 'Successfully answered');
+  //res.redirect(`/events/${req.params.id}`);
+  res.redirect('back');
+}));
+router.delete('/:id/answer', needAuth, catchErrors(async (req,res,body) => {
+  
+  const event = await EVT.findById(req.params.id);
+  var ety = await EntryList.findOne({author: req.user._id, event: event});
+  ety.answer = req.body.answer;
+
+  await ety.save();
+  await event.save();
+  req.flash('success', 'Successfully answered');
   //res.redirect(`/events/${req.params.id}`);
   res.redirect('back');
 }));
@@ -188,7 +236,7 @@ router.post('/:id/entry', needAuth, validateSurvey, catchErrors(async (req,res,b
 router.get('/:id', needAuth, catchErrors(async (req, res, next) => {
   const event = await EVT.findById(req.params.id).populate('author');
   const entrylists = await EntryList.find({event: event.id}).populate('author');
-
+  console.log(entrylists);
   res.render('events/detail', {event: event, entrylists: entrylists});
 }));
 
@@ -198,26 +246,31 @@ router.delete('/:id', needAuth, catchErrors(async (req, res, next) => {
   res.redirect('/events');
 }));
 
-/*  참가한 자신 목록에서 삭제
+/*  참가한 자신 목록에서 삭제 */
 router.delete('/:id/entry', needAuth, catchErrors(async (req, res, next) => {
-  const entrylist = await EntryList.findOneAndRemove({id: req.user.id});
+  const event = await EVT.findById(req.params.id);
+  var lst = await EntryList.findOneAndRemove({author: req.user._id, event: event});
+  
+  lst.survey = false;
+  event.numJoined--;
+  await event.save();
+
   req.flash('success', 'Canceled Successfully.');
   res.redirect('back');
 }));
-*/
+
 
 router.get('/:id/edit', needAuth, catchErrors(async (req, res, next) => {
   const event = await EVT.findById(req.params.id);
   res.render('events/edit', {event: event});
 }));
 
-router.put('/:id', needAuth, catchErrors(async (req, res, next) => {
+router.put('/:id', needAuth, upload.single('img'), catchErrors(async (req, res, next) => {
   const err = validateEvent(req.body);
   if (err) {
     req.flash('danger', err);
     return res.redirect('back');
   }
-
   const event = await EVT.findById({_id: req.params.id});
 
   event.title = req.body.title;
@@ -231,9 +284,16 @@ router.put('/:id', needAuth, catchErrors(async (req, res, next) => {
   event.evt_topic = req.body.evt_topic;
   event.payment = req.body.payment;
 
+  if (req.file) {
+    const dest = path.join(__dirname, '../public/images/uploads/');
+    console.log("File ->", req.file);
+    const filename = req.file.filename + "." + mimetypes[req.file.mimetype];
+    await fs.move(req.file.path, dest + filename);
+    event.img = "/images/uploads/" + filename;
+  }
   await event.save();
   req.flash('success', 'Updated successfully.');
-  res.redirect('/');
+  res.redirect('/list');
 }));
 
 module.exports = router;

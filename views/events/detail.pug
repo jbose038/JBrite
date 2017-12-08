@@ -99,7 +99,7 @@ block content
         if entrylist.author.id == currentUser.id
           a.btn.btn.need-confirm-btn.btn-outline-danger(href=`/events/${event._id}/entry?_method=DELETE`) 신청취소
 
-        if (entrylist.author == currentUser) && !entrylist.survey
+        if (entrylist.author.id == currentUser.id) && !entrylist.survey
           h5 참가신청했다면 간단한 설문을 제출을 해 주시기 바랍니다.
           form(action=`/events/${event.id}/survey`, method='POST')
             .form-group

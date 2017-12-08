@@ -44,12 +44,6 @@ block content
                 a.btn.btn-sm.need-confirm-btn.btn-outline-danger(href=`/events/${event._id}?_method=DELETE`)
                   | #[i.fa.fa-trash] Delete
     
-    p Favorite =
-    each event in events.docs
-      each entrylist in entrylists
-        if entrylist.favorite
-          p= event.title
-
     a.btn.btn-primary(href='/events/new') Create Event
     |
     |

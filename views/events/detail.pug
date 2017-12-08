@@ -43,10 +43,6 @@ block content
       .p= event.org_comment
 
     .detail-buttons
-    
-      a.btn.btn-outline-primary(href=`/events/${event._id}/favorite?_method=POST`) Favorite
-      |
-      |
       a.btn.btn-outline-secondary(href='/events') Back
       |
       |
@@ -73,8 +69,6 @@ block content
                   .form-group
                     input.form-control.input-lg(type='text', id='answer', name='answer', placeholder='답변을 간단히 작성해주세요')
                   button.btn.btn-primary(type="submit") 답변 남기기
-
-                a.btn.btn.need-confirm-btn.btn-outline-danger(href=`/events/${event._id}/answer?_method=DELETE`) Delete
 
     hr
     .container.joined

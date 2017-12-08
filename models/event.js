@@ -14,7 +14,7 @@ var schema = new Schema({
   evt_type: String,
   evt_topic: String,
   payment: {type: Number, default: 0},
-  numJoined: {type: Number, default: 0},
+  numJoined: {type: Number, default: 0, min:0},
   maxJoined: Number,
   img: {type: String},
   createdAt: {type: Date, default: Date.now}

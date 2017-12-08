@@ -158,45 +158,12 @@ router.post('/', needAuth, upload.single('img'), catchErrors(async (req,res,next
   res.redirect('/');
 }));
 
-router.post('/:id/favorite', needAuth, catchErrors(async (req,res,body) => {
-  const event = await EVT.findById(req.params.id);
-  var user = await EntryList.findOne({author: req.user._id, event: event});
-
-  if(!user)
-  {
-    USER = req.user;
-    var entrylist = new EntryList({
-      author: USER._id,
-      event: event,
-      favorite: true
-    });
-
-    await entrylist.save();
-  }
-  else
-  {
-    if(user.favorite)
-    {
-      req.flash('danger', 'Already added event');
-      return res.redirect('back');
-    }
-    else
-    {
-      user.favorite = true;
-      await user.save();
-    }
-    
-  }
-  
-  req.flash('success', 'Successfully added');
-  res.redirect('back');
-}));
-
 router.post('/:id/entry', needAuth, catchErrors(async (req,res,body) => {
   
   const event = await EVT.findById(req.params.id);
   var user = await EntryList.findOne({author: req.user._id, event: event});
-  if(user.apply)
+  console.log(user);
+  if(user && user.apply)
   {
     req.flash('danger', 'You already joined');
     return res.redirect('back');
@@ -204,24 +171,15 @@ router.post('/:id/entry', needAuth, catchErrors(async (req,res,body) => {
 
   user = req.user;
 
-  if(!user)
-  {
-    var entrylist = new EntryList({
-      author: user._id,
-      event: event,
-      apply: true
-    });
-
-    await entrylist.save();
-  }
-  else
-  {
-    user.apply = true;
-  }
-  
+  var entrylist = new EntryList({
+    author: user._id,
+    event: event,
+    apply: true
+  });
 
   event.numJoined++;
   await user.save();
+  await entrylist.save();
   await event.save();
   req.flash('success', 'Successfully joined');
   res.redirect('back');
@@ -253,7 +211,7 @@ router.post('/:id/review', needAuth, catchErrors(async (req,res,body) => {
 router.post('/:id/answer', needAuth, catchErrors(async (req,res,body) => {
   
   const event = await EVT.findById(req.params.id);
-  var ety = await EntryList.findOne({author: req.user._id, event: event});
+  var ety = await EntryList.findOne({review: req.user._id, event: event});
   ety.answer = req.body.answer;
 
   await ety.save();
@@ -276,7 +234,6 @@ router.delete('/:id/answer', needAuth, catchErrors(async (req,res,body) => {
 router.get('/:id', needAuth, catchErrors(async (req, res, next) => {
   const event = await EVT.findById(req.params.id).populate('author');
   const entrylists = await EntryList.find({event: event.id}).populate('author');
-  //console.log(entrylists);
   res.render('events/detail', {event: event, entrylists: entrylists});
 }));
 
@@ -286,13 +243,15 @@ router.delete('/:id', needAuth, catchErrors(async (req, res, next) => {
   res.redirect('/events');
 }));
 
-/*  참가한 자신 목록에서 삭제 */
 router.delete('/:id/entry', needAuth, catchErrors(async (req, res, next) => {
   const event = await EVT.findById(req.params.id);
-  var lst = await EntryList.findOneAndRemove({author: req.user._id, event: event});
-  
+  const lst = await EntryList.findOneAndRemove({author: req.user._id, event: event});
   lst.survey = false;
+  lst.apply = false;
+
   event.numJoined--;
+
+  await lst.save();
   await event.save();
 
   req.flash('success', 'Canceled Successfully.');

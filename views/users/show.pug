@@ -6,8 +6,7 @@ block content
           
     dl.row
       dt.col-sm-3 Email
-      dd.col-sm-9
-        a(href=`mailto:${user.email}`)= user.email
+      dd.col-sm-9= user.email
 
       dt.col-sm-3 Created At
       dd.col-sm-9= user.createdAt
@@ -33,6 +32,7 @@ block content
         dt.col-sm-3 Kakao
         dd.col-sm-9
           img.img-fluid.rounded-circle(src= '/images/kprofile.png')
+
     hr
     p
       if currentUser.isAdmin

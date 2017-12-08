@@ -4,8 +4,9 @@ block content
   .container
     form.form-inline.search-input-group(action='/events', method='GET')
       input.form-control.mr-sm-2(type='text', name='term', placeholder='제목 / 장소 / 종류 / 주제', aria-label='Search', value=term)
-      i.fa.fa-search
-
+      button.btn.btn-primary(type="submit")
+        i.fa.fa-search
+        | 검색
   .container
     h1.main-title= 'Events For You(=' + currentUser.name + ')'
     
@@ -43,6 +44,12 @@ block content
                 a.btn.btn-sm.need-confirm-btn.btn-outline-danger(href=`/events/${event._id}?_method=DELETE`)
                   | #[i.fa.fa-trash] Delete
     
+    p Favorite =
+    each event in events.docs
+      each entrylist in entrylists
+        if entrylist.favorite
+          p= event.title
+
     a.btn.btn-primary(href='/events/new') Create Event
     |
     |

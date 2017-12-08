@@ -43,6 +43,10 @@ block content
       .p= event.org_comment
 
     .detail-buttons
+    
+      a.btn.btn-outline-primary(href=`/events/${event._id}/favorite?_method=POST`) Favorite
+      |
+      |
       a.btn.btn-outline-secondary(href='/events') Back
       |
       |
@@ -68,7 +72,7 @@ block content
                 form(action=`/events/${event.id}/answer`, method='POST')
                   .form-group
                     input.form-control.input-lg(type='text', id='answer', name='answer', placeholder='답변을 간단히 작성해주세요')
-                  button.btn.btn-primary#review(type="submit") 답변 남기기
+                  button.btn.btn-primary(type="submit") 답변 남기기
 
                 a.btn.btn.need-confirm-btn.btn-outline-danger(href=`/events/${event._id}/answer?_method=DELETE`) Delete
 
@@ -77,48 +81,47 @@ block content
       h5 현재 이벤트 정원 #{event.maxJoined} 중 #{event.numJoined} 명 현재 참여중
       h7 (#{event.maxJoined - event.numJoined}명 남았습니다)
 
-      if event.author == currentuser
+      if event.author.id == currentUser.id
         .p 신청자 / 소속 / 참여한 이유
           each entrylist in entrylists
-            .p= entrylist.author.name + ' / ' + entrylist.org + ' / ' + entrylist.reason
-      h3.msg 해당 이벤트 등록자만 전체 신청목록을 확인 할 수 있습니다.
+            if entrylist.org && entrylist.reason
+              p= entrylist.author.name + ' / ' + entrylist.org + ' / ' + entrylist.reason
+            else
+              p= entrylist.author.name + ' / (신청자가 아직 소속과 참여한 이유를 작성하지 않았습니다.)'
+      else
+        h3.msg 해당 이벤트 등록자만 전체 신청목록을 확인 할 수 있습니다.
     hr
 
-    
-    if !currentUser.isAdmin && (event.author.id != currentUser.id) && (event.maxJoined > event.numJoined)
-      each entrylist in entrylists
-        if entrylist.author != currentUser
-          a.btn.btn-outline-primary(href=`/events/${event._id}/entry?_method=POST`) 신청
-        if entrylist.author.id == currentUser.id
-          a.btn.btn-sm.need-confirm-btn.btn-outline-danger(href=`/events/${event._id}/entry?_method=DELETE`) 신청취소
-    each entrylist in entrylists
-      if (entrylist.author == currentUser) && !entrylist.survey
-        h5 참가신청했다면 간단한 설문을 제출을 해 주시기 바랍니다.
-        form(action=`/events/${event.id}/survey`, method='POST')
-          .form-group
-            label(for='org') 본인의 소속
-            input.form-control.input-lg(type='text', id='org', name='org', placeholder='소속을 간단히 작성해주세요')
-          .form-group
-            label(for='reason') 참여하게 된 이유
-            input.form-control.input-lg(type='text', id='reason', name='reason', placeholder='참여 이유를 간단히 작성해주세요')
-          button.btn.btn-primary(type="submit") 제출
-      else
-        h5 이미 참가 신청 되었습니다.
-
-        if entrylist.author.name == currentUser.name && entrylist.review 
-          h5 이미 리뷰를 작성했습니다.
-        else
-          form(action=`/events/${event.id}/review`, method='POST')
-            .form-group
-              input.form-control.input-lg(type='text', id='review', name='review', placeholder='후기를 간단히 작성해주세요')
-              button.btn.btn-primary#review(type="submit") 후기 남기기
-  
-    //참가한 자신 목록에서 삭제
-    
+    if !currentUser.isAdmin && event.author.id == currentUser.id
+      h3.msg 해당 이벤트 등록자는 참가신청이 불가능합니다.
+    else if currentUser.isAdmin
+      h3.msg 관리자상태입니다. 이벤트 관리만 할 수 있습니다.
+    else if !currentUser.isAdmin && (event.author.id != currentUser.id) && (event.maxJoined > event.numJoined)
       
-    
+      a.btn.btn-outline-primary(href=`/events/${event._id}/entry?_method=POST`) 신청
+      |
+      |
+      each entrylist in entrylists
+        if entrylist.author.id == currentUser.id
+          a.btn.btn.need-confirm-btn.btn-outline-danger(href=`/events/${event._id}/entry?_method=DELETE`) 신청취소
 
-      if !currentUser.isAdmin && event.author.id == currentUser.id
-        h3.msg 해당 이벤트 등록자는 참가신청이 불가능합니다.
-      if currentUser.isAdmin
-        h3.msg 관리자상태입니다. 이벤트 관리만 할 수 있습니다.
+        if (entrylist.author == currentUser) && !entrylist.survey
+          h5 참가신청했다면 간단한 설문을 제출을 해 주시기 바랍니다.
+          form(action=`/events/${event.id}/survey`, method='POST')
+            .form-group
+              label(for='org') 본인의 소속
+              input.form-control.input-lg(type='text', id='org', name='org', placeholder='소속을 간단히 작성해주세요')
+            .form-group
+              label(for='reason') 참여하게 된 이유
+              input.form-control.input-lg(type='text', id='reason', name='reason', placeholder='참여 이유를 간단히 작성해주세요')
+            button.btn.btn-primary(type="submit") 제출
+        else
+          h5 참가 신청 되었습니다.
+
+          if entrylist.author.name == currentUser.name && entrylist.review 
+            h5 이미 리뷰를 작성했습니다.
+          else
+            form(action=`/events/${event.id}/review`, method='POST')
+              .form-group
+                input.form-control.input-lg(type='text', id='review', name='review', placeholder='후기를 간단히 작성해주세요')
+                button.btn.btn-primary#review(type="submit") 후기 남기기

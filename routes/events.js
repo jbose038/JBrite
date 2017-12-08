@@ -157,31 +157,75 @@ router.post('/', needAuth, upload.single('img'), catchErrors(async (req,res,next
   req.flash('success', 'Registered successfully');
   res.redirect('/');
 }));
-router.post('/:id/entry', needAuth, catchErrors(async (req,res,body) => {
-  
-    const event = await EVT.findById(req.params.id);
-    var user = await EntryList.findOne({author: req.user._id, event: event});
-    if(user)
-    {
-      req.flash('danger', 'You already joined');
-      return res.redirect('back');
-    }
-  
-    user = req.user;
-  
+
+router.post('/:id/favorite', needAuth, catchErrors(async (req,res,body) => {
+  const event = await EVT.findById(req.params.id);
+  var user = await EntryList.findOne({author: req.user._id, event: event});
+
+  if(!user)
+  {
+    USER = req.user;
     var entrylist = new EntryList({
-      author: user._id,
-      event: event
+      author: USER._id,
+      event: event,
+      favorite: true
     });
 
-    event.numJoined++;
-    await user.save();
     await entrylist.save();
-    await event.save();
-    req.flash('success', 'Successfully joined');
-    //res.redirect(`/events/${req.params.id}`);
-    res.redirect('back');
-  }));
+  }
+  else
+  {
+    if(user.favorite)
+    {
+      req.flash('danger', 'Already added event');
+      return res.redirect('back');
+    }
+    else
+    {
+      user.favorite = true;
+      await user.save();
+    }
+    
+  }
+  
+  req.flash('success', 'Successfully added');
+  res.redirect('back');
+}));
+
+router.post('/:id/entry', needAuth, catchErrors(async (req,res,body) => {
+  
+  const event = await EVT.findById(req.params.id);
+  var user = await EntryList.findOne({author: req.user._id, event: event});
+  if(user.apply)
+  {
+    req.flash('danger', 'You already joined');
+    return res.redirect('back');
+  }
+
+  user = req.user;
+
+  if(!user)
+  {
+    var entrylist = new EntryList({
+      author: user._id,
+      event: event,
+      apply: true
+    });
+
+    await entrylist.save();
+  }
+  else
+  {
+    user.apply = true;
+  }
+  
+
+  event.numJoined++;
+  await user.save();
+  await event.save();
+  req.flash('success', 'Successfully joined');
+  res.redirect('back');
+}));
 router.post('/:id/survey', needAuth, validateSurvey, catchErrors(async (req,res,body) => {
 
   const event = await EVT.findById(req.params.id);
@@ -193,7 +237,6 @@ router.post('/:id/survey', needAuth, validateSurvey, catchErrors(async (req,res,
 
   await user.save();
   req.flash('success', 'Successfully joined');
-  //res.redirect(`/events/${req.params.id}`);
   res.redirect('back');
 }));
 router.post('/:id/review', needAuth, catchErrors(async (req,res,body) => {
@@ -205,7 +248,6 @@ router.post('/:id/review', needAuth, catchErrors(async (req,res,body) => {
 
   await user.save();
   req.flash('success', 'Successfully registered');
-  //res.redirect(`/events/${req.params.id}`);
   res.redirect('back');
 }));
 router.post('/:id/answer', needAuth, catchErrors(async (req,res,body) => {
@@ -217,7 +259,6 @@ router.post('/:id/answer', needAuth, catchErrors(async (req,res,body) => {
   await ety.save();
   await event.save();
   req.flash('success', 'Successfully answered');
-  //res.redirect(`/events/${req.params.id}`);
   res.redirect('back');
 }));
 router.delete('/:id/answer', needAuth, catchErrors(async (req,res,body) => {
@@ -229,14 +270,13 @@ router.delete('/:id/answer', needAuth, catchErrors(async (req,res,body) => {
   await ety.save();
   await event.save();
   req.flash('success', 'Successfully answered');
-  //res.redirect(`/events/${req.params.id}`);
   res.redirect('back');
 }));
 
 router.get('/:id', needAuth, catchErrors(async (req, res, next) => {
   const event = await EVT.findById(req.params.id).populate('author');
   const entrylists = await EntryList.find({event: event.id}).populate('author');
-  console.log(entrylists);
+  //console.log(entrylists);
   res.render('events/detail', {event: event, entrylists: entrylists});
 }));
 
